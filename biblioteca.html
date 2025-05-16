@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Biblioteca Escolar - Cadastro e Painel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  header {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 2.8rem;
+    color: #2c3e50;
+    letter-spacing: 2px;
+  }
+  main {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(44,62,80,0.15);
+    padding: 30px 40px;
+    width: 100%;
+    max-width: 800px;
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin-bottom: 20px;
+    color: #34495e;
+  }
+  label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #34495e;
+  }
+  input[type="text"], input[type="password"], input[type="date"] {
+    padding: 14px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 8px #3498dbaa;
+  }
+  button {
+    padding: 14px 0;
+    background-color: #3498db;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px #2980b9cc;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .confirmation {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    display: none;
+  }
+  .hidden {
+    display: none;
+  }
+  /* Painel administrativo */
+  .filters {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .filters > div {
+    flex: 1 1 150px;
+    display: flex;
+    flex-direction: column;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+  th, td {
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  th {
+    background-color: #f4f7fa;
+    font-weight: 600;
+    color: #34495e;
+  }
+  tbody tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+  /* Relatórios */
+  .report {
+    background: #ecf0f1;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  .report h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  .report p {
+    font-size: 1rem;
+    color: #34495e;
+  }
+  footer {
+    margin-top: 50px;
+    color: #95a5a6;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+  /* Responsividade */
+  @media(max-width: 600px) {
+    main {
+      padding: 20px;
+      max-width: 100%;
+    }
+    .filters {
+      flex-direction: column;
+    }
+    .filters > div {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Biblioteca Escolar</h1>
+</header>
+
+<main>
+
+  <!-- Tela de Cadastro (visível inicialmente) -->
+  <section id="section-cadastro">
+    <h2>Cadastro de Acesso</h2>
+    <form id="form-acesso">
+      <label for="nome">Nome Completo</label>
+      <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required />
+
+      <label for="curso">Curso</label>
+      <input type="text" id="curso" name="curso" placeholder="Digite seu curso" required />
+
+      <label for="turma">Turma</label>
+      <input type="text" id="turma" name="turma" placeholder="Digite sua turma" required />
+
+      <button type="submit">Registrar Entrada</button>
+    </form>
+    <div class="confirmation" id="confirmation-msg">
+      Obrigado! Seu acesso foi registrado com sucesso.
+    </div>
+    <button id="btn-ir-painel" style="margin-top:20px; background:#27ae60;">Ir para Painel Administrativo</button>
+  </section>
+
+  <!-- Tela de Login -->
+  <section id="section-login" class="hidden">
+    <h2>Acesso Administrativo</h2>
+    <form id="form-login">
+      <label for="username">Usuário</label>
+      <input type="text" id="username" name="username" placeholder="Digite seu usuário" required />
+      <label for="password">Senha</label>
+      <input type="password" id="password" name="password" placeholder="Digite sua senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="confirmation" id="login-error" style="background-color:#f8d7da; color:#721c24; border-color:#f5c6cb;"></div>
+    <button id="btn-voltar-cadastro" style="margin-top:20px; background:#7f8c8d;">Voltar para Cadastro</button>
+  </section>
+
+  <!-- Painel Administrativo -->
+  <section id="section-painel" class="hidden">
+    <h2>Painel Administrativo</h2>
+
+    <div class="filters">
+      <div>
+        <label for="filter-data">Filtrar por Data</label>
+        <input type="date" id="filter-data" />
+      </div>
+      <div>
+        <label for="filter-nome">Filtrar por Nome</label>
+        <input type="text" id="filter-nome" placeholder="Nome do aluno" />
+      </div>
+      <div>
+        <label for="filter-turma">Filtrar por Turma</label>
+        <input type="text" id="filter-turma" placeholder="Turma" />
+      </div>
+      <div>
+        <button id="btn-limpar-filtros" style="margin-top: 25px; background:#e67e22;">Limpar Filtros</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Curso</th>
+          <th>Turma</th>
+          <th>Data de Entrada</th>
+          <th>Hora de Entrada</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Linhas geradas via JS -->
+      </tbody>
+    </table>
+
+    <div class="report">
+      <h3>Relatórios de Fluxo</h3>
+      <p><strong>Hoje:</strong> <span id="report-hoje">0</span> acessos</p>
+      <p><strong>Últimos 7 dias:</strong> <span id="report-semana">0</span> acessos</p>
+      <p><strong>Últimos 30 dias:</strong> <span id="report-mes">0</span> acessos</p>
+    </div>
+
+    <button id="btn-logout" style="background:#c0392b;">Sair do Painel</button>
+  </section>
+
+</main>
+
+<footer>
+  &copy; 2025 Biblioteca Escolar. Todos os direitos reservados.
+</footer>
+
+<script>
+  // Dados simulados
+  let acessos = [
+    { id:1, nome:"João Silva", curso:"Engenharia", turma:"A1", data:"2025-05-15", hora:"08:30" },
+    { id:2, nome:"Maria Oliveira", curso:"Matemática", turma:"B2", data:"2025-05-16", hora:"09:15" },
+    { id:3, nome:"Pedro Santos", curso:"Biologia", turma:"C3", data:"2025-05-16", hora:"10:05" },
+    { id:4, nome:"Ana Paula", curso:"História", turma:"A1", data:"2025-05-17", hora:"08:55" },
+    { id:5, nome:"Carlos Lima", curso:"Engenharia", turma:"B2", data:"2025-05-17", hora:"09:45" },
+    { id:6, nome:"Laura Costa", curso:"Matemática", turma:"C3", data:"2025-05-18", hora:"11:10" }
+  ];
+
+  // Usuário e senha para acesso administrativo (exemplo simples)
+  const USUARIO_ADMIN = 'admin';
+  const SENHA_ADMIN = '1234';
+
+  // Elementos
+  const sectionCadastro = document.getElementById('section-cadastro');
+  const sectionLogin = document.getElementById('section-login');
+  const sectionPainel = document.getElementById('section-painel');
+  const formAcesso = document.getElementById('form-acesso');
+  const confirmationMsg = document.getElementById('confirmation-msg');
+  const btnIrPainel = document.getElementById('btn-ir-painel');
+  const formLogin = document.getElementById('form-login');
+  const loginError = document.getElementById('login-error');
+  const btnVoltarCadastro = document.getElementById('btn-voltar-cadastro');
+  const tableBody = document.getElementById('table-body');
+  const filterData = document.getElementById('filter-data');
+  const filterNome = document.getElementById('filter-nome');
+  const filterTurma = document.getElementById('filter-turma');
+  const btnLimparFiltros = document.getElementById('btn-limpar-filtros');
+  const reportHoje = document.getElementById('report-hoje');
+  const reportSemana = document.getElementById('report-semana');
+  const reportMes = document.getElementById('report-mes');
+  const btnLogout = document.getElementById('btn-logout');
+
+  // Formulário cadastro - adicionar acesso
+  formAcesso.addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = formAcesso.nome.value.trim();
+    const curso = formAcesso.curso.value.trim();
+    const turma = formAcesso.turma.value.trim();
+
+    if(nome && curso && turma) {
+      const dataAtual = new Date();
+      const dataStr = dataAtual.toISOString().split('T')[0];
+      const horaStr = dataAtual.toTimeString().split(' ')[0].slice(0,5);
+      const novoId = acessos.length ? acessos[acessos.length-1].id + 1 : 1;
+
+      acessos.push({
+        id: novoId,
+        nome,
+        curso,
+        turma,
+        data: dataStr,
+        hora: horaStr
+      });
+
+      confirmationMsg.style.display = 'block';
+      formAcesso.reset();
+
+      setTimeout(() => {
+        confirmationMsg.style.display = 'none';
+      }, 3500);
+    }
+  });
+
+  // Navegar para painel - mostra login
+  btnIrPainel.addEventListener('click', () => {
+    sectionCadastro.classList.add('hidden');
+    sectionLogin.classList.remove('hidden');
+  });
+
+  // Voltar para cadastro
+  btnVoltarCadastro.addEventListener('click', () => {
+    sectionLogin.classList.add('hidden');
+    sectionCadastro.classList.remove('hidden');
+    loginError.style.display = 'none';
+  });
+
+  // Login
+  formLogin.addEventListener('submit', e => {
+    e.preventDefault();
+    const user = formLogin.username.value.trim();
+    const pass = formLogin.password.value.trim();
+
+    if(user === USUARIO_ADMIN && pass === SENHA_ADMIN) {
+      sectionLogin.classList.add('hidden');
+      sectionPainel.classList.remove('hidden');
+      loginError.style.display = 'none';
+      formLogin.reset();
+      renderTabela(acessos);
+      atualizarRelatorios(acessos);
+      limparFiltrosInputs();
+    } else {
+      loginError.textContent = 'Usuário ou senha inválidos!';
+      loginError.style.display = 'block';
+    }
+  });
+
+  // Logout
+  btnLogout.addEventListener('click', () => {
+    sectionPainel.classList.add('hidden');
+    sectionCadastro.classList.remove('hidden');
+  });
+
+  // Renderizar tabela com filtros
+  function renderTabela(lista) {
+    tableBody.innerHTML = '';
+    if(lista.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>';
+      return;
+    }
+    lista.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.id}</td>
+        <td>${item.nome}</td>
+        <td>${item.curso}</td>
+        <td>${item.turma}</td>
+        <td>${item.data}</td>
+        <td>${item.hora}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  // Filtrar lista
+  function filtrarLista() {
+    let listaFiltrada = acessos;
+
+    const dataFiltro = filterData.value;
+    const nomeFiltro = filterNome.value.toLowerCase();
+    const turmaFiltro = filterTurma.value.toLowerCase();
+
+    if(dataFiltro) {
+      listaFiltrada = listaFiltrada.filter(item => item.data === dataFiltro);
+    }
+    if(nomeFiltro) {
+      listaFiltrada = listaFiltrada.filter(item => item.nome.toLowerCase().includes(nomeFiltro));
+    }
+    if(turmaFiltro) {
+      listaFiltrada = listaFiltrada.filter(item => item.turma.toLowerCase().includes(turmaFiltro));
+    }
+
+    renderTabela(listaFiltrada);
+    atualizarRelatorios(listaFiltrada);
+  }
+
+  // Atualizar relatórios
+  function atualizarRelatorios(lista) {
+    const hoje = new Date();
+    const hojeStr = hoje.toISOString().split('T')[0];
+
+    // Função para converter string yyyy-mm-dd em Date
+    function strParaData(str) {
+      const [y,m,d] = str.split('-').map(Number);
+      return new Date(y,m-1,d);
+    }
+
+    // Contar acessos
+    let countHoje = 0;
+    let countSemana = 0;
+    let countMes = 0;
+
+    lista.forEach(item => {
+      const dataItem = strParaData(item.data);
+      const diffDias = Math.floor((hoje - dataItem) / (1000 * 60 * 60 * 24));
+      if(item.data === hojeStr) countHoje++;
+      if(diffDias >= 0 && diffDias < 7) countSemana++;
+      if(diffDias >= 0 && diffDias < 30) countMes++;
+    });
+
+    reportHoje.textContent = countHoje;
+    reportSemana.textContent = countSemana;
+    reportMes.textContent = countMes;
+  }
+
+  // Eventos filtros
+  filterData.addEventListener('change', filtrarLista);
+  filterNome.addEventListener('input', filtrarLista);
+  filterTurma.addEventListener('input', filtrarLista);
+  btnLimparFiltros.addEventListener('click', () => {
+    limparFiltrosInputs();
+    renderTabela(acessos);
+    atualizarRelatorios(acessos);
+  });
+
+  function limparFiltrosInputs() {
+    filterData.value = '';
+    filterNome.value = '';
+    filterTurma.value = '';
+  }
+</script>
+
+</body>
+</html>
